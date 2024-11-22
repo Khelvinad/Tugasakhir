@@ -32,15 +32,15 @@ public class Kartu {
     public static void jual(){
         int beli = (int) (Math.random() * Backpack.index);
         for (int i = 0; i < Backpack.index; i++) {
-            if (Backpack.GetHasil()[beli] == null) {
+            if (Backpack.getCards()[beli] == null) {
                 beli = (int) (Math.random() * Backpack.index);
-                if (Backpack.GetHasil()[beli] != null) break;
+                if (Backpack.getCards()[beli] != null) break;
             }
         }
         System.out.println("Membeli : ");
-        System.out.printf("|%-17s|%-17d|%-17s|\n", Backpack.GetHasil()[beli].pokemon, Backpack.GetHasil()[beli].harga, Backpack.GetHasil()[beli].rarity);
-        User.uang += Backpack.GetHasil()[beli].harga;
-        Backpack.GetHasil()[beli] = null;
+        System.out.printf("|%-17s|%-17d|%-17s|\n", Backpack.getCards()[beli].pokemon, Backpack.getCards()[beli].harga, Backpack.getCards()[beli].rarity);
+//        User.uang += Backpack.getCards()[beli].harga;
+        Backpack.getCards()[beli] = null;
         Backpack.index -= 1;
     }
 }

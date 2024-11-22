@@ -3,97 +3,149 @@ import model.Kartu;
 import model.Table;
 import model.User;
 import utils.ListUser;
+
 import java.util.Scanner;
 
 public class Main {
     static Scanner sc = new Scanner(System.in);
+    static ListUser listUser = new ListUser();
+    static boolean login = false;
+    protected static int lengthConsole = 50;
+    protected static int userIdCounter = 1;
+    protected static int userIdLogin = 0;
+    protected static int indexUserLogin = -1;
 
     public static void main(String[] args) throws InterruptedException {
-        boolean login = false;
-        User[] user = new User[5];
-        int jmluser = 0;
+        auth();
+        if (login) gamesLogic();
+    }
 
-        while(!login) {
-            System.out.println("""
-                    --- Welcome to ---
-                    - Ternak Pokemon -
-                    1.Login
-                    2.Register
-                    Pilihan :\s""");
-            int userp = sc.nextInt();
+    static void printMenuGame() {
+        System.out.println("=".repeat(lengthConsole));
+        printCenter("Selamat Datang", lengthConsole);
+        printCenter("Menu", lengthConsole);
+        System.out.println("=".repeat(lengthConsole));
+        System.out.println("""
+                1. Gacha
+                2. Jual
+                3. List Ternak
+                4. Upgrade
+                0. Keluar""");
+    }
+
+    static void printAuthMenu() {
+        System.out.println("=".repeat(lengthConsole));
+        printCenter("Selamat Datang", lengthConsole);
+        printCenter("Silahkan masuk menggunakan akun terlebih dahulu", lengthConsole);
+        System.out.println("=".repeat(lengthConsole));
+        System.out.println("""
+                1. Login
+                2. Register
+                0. Keluar""");
+    }
+
+    static void printCenter(String word, int length) {
+        int wordLength = word.length();
+        System.out.println(" ".repeat((length - wordLength) / 2) + word);
+    }
+
+    static int getAndPrintChoice(boolean withEndLine) {
+        System.out.print("Pilihan: ");
+        int c = sc.nextInt();
+        if (withEndLine) System.out.println("=".repeat(lengthConsole));
+        return c;
+    }
+
+    static void auth() {
+        loopAuth:
+        while (!login) {
+            printAuthMenu();
+            int choiceMenu = getAndPrintChoice(true);
             String nama, password;
-            if (userp == 1) {
-                System.out.print("Masukkan Username : ");
-                nama = sc.next();
-                System.out.print("Masukkan Password : ");
-                password = sc.next();
 
-                boolean found = false;
-                for (int i = 0; i<user.length; i++) {
-                    if (user[i] != null && user[i].getnama().equals(nama) && user[i].getpass().equals(password)) {
-                        System.out.println("Login berhasil!");
-                        login = true;
-                        found = true;
-                        break;
+            switch (choiceMenu) {
+                case 1 -> {
+                    System.out.print("Masukkan Username : ");
+                    nama = sc.next();
+                    System.out.print("Masukkan Password : ");
+                    password = sc.next();
+
+                    User[] users = listUser.fill;
+                    for (int i = 0; i < users.length; i++) {
+                        if (users[i].getNama().equals(nama) && users[i].getPassword().equals(password)) {
+                            System.out.println("Login berhasil!");
+                            login = true;
+                            userIdLogin = users[i].getUserId();
+                            indexUserLogin = i;
+                            break loopAuth;
+                        }
                     }
-                }
 
-                if (!found) {
                     System.out.println("Login gagal! Username belum terdaftar.");
                 }
-            } else if (userp == 2) {
-                System.out.print("Masukkan Username : ");
-                nama = sc.next();
-                System.out.print("Masukkan Password : ");
-                password = sc.next();
-                user[jmluser++] = new User(nama, password);
-                System.out.println("Pendaftaran berasil! silakan login.");
+                case 2 -> {
+                    System.out.print("Masukkan Username : ");
+                    nama = sc.next();
+                    System.out.print("Masukkan Password : ");
+                    password = sc.next();
+                    listUser.add(new User(nama, password, userIdCounter));
+                    System.out.println("Pendaftaran berasil! silakan login.");
+                }
+                case 0 -> {
+                    System.out.println("Keluar.");
+                    break loopAuth;
+                }
+                default -> System.out.println("Pilihan tidak tersedia");
             }
         }
+    }
 
+    static void logout() {
+        userIdLogin = 0;
+        login = false;
+        indexUserLogin = -1;
+    }
+
+    static void gamesLogic() throws InterruptedException {
+        loopLogic:
         do {
-            System.out.print("""
-                    --- Welcome to ---
-                    - Ternak Pokemon -
-                    1. Gacha
-                    2. Jual
-                    3. List Ternak
-                    4. Upgrade
-                    5. uang
-                    0. Keluar
-                    Pilihan :\s""");
-            int pilih = sc.nextInt();
+            printInfoUser(listUser.fill[indexUserLogin]);
+            printMenuGame();
+            int choice = getAndPrintChoice(true);
 
-            switch (pilih) {
-                case 0:
-                    System.out.println("Keluar...");
-                    User.uang = -1;
-                    break;
-                case 1:
+            switch (choice) {
+                case 0 -> {
+                    System.out.println("Keluar.");
+                    break loopLogic;
+                }
+                case 1 -> {
                     System.out.println("1x Gacha Rp.10.000");
                     System.out.print("Gacha berapa kali :");
                     Table.Tgacha();
                     System.out.println();
-                    break;
-                case 2:
+                }
+                case 2 -> {
                     Kartu.jual();
-                    break;
-                case 3:
-                    System.out.println("Slot Bpack : "+ Backpack.slot);
+                }
+                case 3 -> {
+
+//                    System.out.println("Slot Bpack : " + Backpack.slot);
                     System.out.printf("|%-16s |%-16s |%-16s |\n", "List Ternak", "Value", "Rarity");
                     System.out.println("+-----------------------------------+");
                     for (int i = 0; i < Backpack.index; i++) {
-                        System.out.printf("|%-17s|%-17d|%-17s|\n", Backpack.GetHasil()[i].pokemon, Backpack.GetHasil()[i].harga, Backpack.GetHasil()[i].rarity);
+                        System.out.printf("|%-17s|%-17d|%-17s|\n", Backpack.getCards()[i].pokemon, Backpack.getCards()[i].harga, Backpack.getCards()[i].rarity);
                     }
                     break;
-                case 4:
+                }
+                case 4 -> {
+
                     System.out.println("""
                             -Pilihan Upgrade Bpack-
                             1. +5 Slot
                             2. +10 Slot
                             Pilihan :\s""");
                     int upgrade = sc.nextInt();
-                    System.out.println("Slot Bpack : "+ Backpack.slot);
+//                    System.out.println("Slot Bpack : " + Backpack.slot);
                     switch (upgrade) {
                         case 1:
                             Backpack.upgrade(5);
@@ -103,12 +155,17 @@ public class Main {
                             break;
                     }
                     break;
-                case 5:
-                    System.out.println(User.uang);
-                    break;
+                }
+                case 5 -> {
+
+                }
             }
-        } while (User.uang != -1);
+        } while (true);
     }
 
-
+    static void printInfoUser(User user) {
+        System.out.println("Username: " + user.getNama());
+        System.out.println("Uang: " + user.uang);
+        System.out.println("Backpack: " + user.backpack.getTotalFill() + "/" + user.backpack.getSlot() + " Pokemon");
+    }
 }
