@@ -165,7 +165,7 @@ public class Main {
 
     static void printInfoUser(User user) {
         System.out.println("Username: " + user.getNama());
-        System.out.println("Uang: " + user.uang);
+        System.out.println("Uang: Rp." + String.format("%,d\n",user.uang));
         System.out.println("Backpack: " + user.backpack.getTotalFill() + "/" + user.backpack.getSlot() + " Pokemon");
     }
 }
