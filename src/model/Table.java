@@ -10,13 +10,13 @@ public class Table {
     public static void Tgacha() throws InterruptedException {
         int gac = sc.nextInt();
         Loading.init();
-//        if (User.uang< gac * 10000){
-//            System.out.printf("-Uang anda tidak cukup untuk %d kali gacha-",gac);
-//            return;
-//        }
+        if (User.uang< gac * 10000){
+            System.out.printf("-Uang anda tidak cukup untuk %d kali gacha-",gac);
+            return ;
+        }
         Pokemon pokemon = new Pokemon();
         pokemon.Listpokemon();
-//        Kartu[][] kartuarr = pokemon.getKartuarr();
+//        Kartu[][] kartuarr = pokemon.getCard();
         for (int i = 0; i < gac; i++) {
 //            if (User.uang >= 10000) {
 //                User.uang -= 10000;

@@ -3,7 +3,7 @@ package model;
 public class User {
     private String nama;
     public int userId;
-    public int uang = 150000;
+    public static int uang = 150000;
     private String password;
     public Backpack backpack;
 
