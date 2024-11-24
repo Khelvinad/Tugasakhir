@@ -1,6 +1,5 @@
 import model.Backpack;
-import model.Kartu;
-import model.Table;
+import model.Card;
 import model.User;
 import utils.ListUser;
 
@@ -14,6 +13,7 @@ public class Main {
     protected static int userIdCounter = 1;
     protected static int userIdLogin = 0;
     protected static int indexUserLogin = -1;
+    protected static int hargaGacha = 5000;
 
     public static void main(String[] args) throws InterruptedException {
         auth();
@@ -21,22 +21,16 @@ public class Main {
     }
 
     static void printMenuGame() {
-        System.out.println("=".repeat(lengthConsole));
-        printCenter("Selamat Datang", lengthConsole);
-        printCenter("Menu", lengthConsole);
-        System.out.println("=".repeat(lengthConsole));
         System.out.println("""
                 1. Gacha
-                2. Jual
-                3. List Ternak
-                4. Upgrade
+                2. Backpack
                 0. Keluar""");
     }
 
     static void printAuthMenu() {
         System.out.println("=".repeat(lengthConsole));
-        printCenter("Selamat Datang", lengthConsole);
-        printCenter("Silahkan masuk menggunakan akun terlebih dahulu", lengthConsole);
+        printlnCenter("Selamat Datang", lengthConsole);
+        printlnCenter("Silahkan masuk menggunakan akun terlebih dahulu", lengthConsole);
         System.out.println("=".repeat(lengthConsole));
         System.out.println("""
                 1. Login
@@ -44,7 +38,7 @@ public class Main {
                 0. Keluar""");
     }
 
-    static void printCenter(String word, int length) {
+    static void printlnCenter(String word, int length) {
         int wordLength = word.length();
         System.out.println(" ".repeat((length - wordLength) / 2) + word);
     }
@@ -72,7 +66,7 @@ public class Main {
 
                     User[] users = listUser.fill;
                     for (int i = 0; i < users.length; i++) {
-                        if (users[i].getNama().equals(nama) && users[i].getPassword().equals(password)) {
+                        if (users[i].getName().equals(nama) && users[i].getPassword().equals(password)) {
                             System.out.println("Login berhasil!");
                             login = true;
                             userIdLogin = users[i].getUserId();
@@ -98,6 +92,7 @@ public class Main {
                 default -> System.out.println("Pilihan tidak tersedia");
             }
         }
+        System.out.println("=".repeat(lengthConsole));
     }
 
     static void logout() {
@@ -110,6 +105,7 @@ public class Main {
         loopLogic:
         do {
             printInfoUser(listUser.fill[indexUserLogin]);
+            System.out.println("=".repeat(lengthConsole));
             printMenuGame();
             int choice = getAndPrintChoice(true);
 
@@ -119,33 +115,72 @@ public class Main {
                     break loopLogic;
                 }
                 case 1 -> {
-                    System.out.println("1x Gacha Rp.10.000");
-                    System.out.print("Gacha berapa kali :");
-                    Table.Tgacha();
-                    System.out.println();
+                    while (true) {
+                        System.out.println("* Masukkan 0 untuk keluar");
+                        System.out.println("1x Gacha Rp10.000");
+                        int maxGacha = listUser.fill[indexUserLogin].money / hargaGacha;
+                        System.out.println("Max gacha: " + maxGacha + "x");
+                        System.out.print("Gacha: ");
+                        int totalGacha = sc.nextInt();
+                        if (totalGacha > listUser.fill[indexUserLogin].backpack.getSlot()) {
+                            System.out.println("Slot tidak cukup.");
+                            continue;
+                        } else if (totalGacha > maxGacha) {
+                            System.out.println("Uang anda kurang.");
+                            System.out.println("-".repeat(lengthConsole));
+                            continue;
+                        } else if (totalGacha == 0) {
+                            break;
+                        }
+                        Card[] gacha = listUser.fill[indexUserLogin].gacha(totalGacha);
+                        System.out.println("=".repeat(lengthConsole));
+                        System.out.printf("| %-10s | %-18s | Rp%-10s |\n", "Rarity", "Pokemon", "Harga");
+                        System.out.println("-".repeat(lengthConsole));
+                        int totalPrice = 0;
+                        for (Card card : gacha) {
+                            System.out.printf("| %-10s | %-18s | Rp%-10s |\n", card.rarity, card.pokemon, moneyFormat(card.harga));
+                            totalPrice += card.harga;
+                            listUser.fill[indexUserLogin].backpack.addCard(card);
+                        }
+                        System.out.println("-".repeat(lengthConsole));
+                        System.out.printf("%" + (lengthConsole - 2) + "s |\n", "Total Harga: Rp" + moneyFormat(totalPrice));
+                        System.out.println("=".repeat(lengthConsole));
+                    }
+                    System.out.println("=".repeat(lengthConsole));
                 }
                 case 2 -> {
-                    Kartu.jual();
+                    printlnCenter("Daftar Pokemon", lengthConsole);
+                    System.out.println("=".repeat(lengthConsole));
+                    System.out.printf("| %-10s | %-18s | Rp%-10s |\n", "Rarity", "Pokemon", "Harga");
+                    System.out.println("-".repeat(lengthConsole));
+                    int totalPrice = 0;
+                    if (listUser.fill[indexUserLogin].backpack.getTotalFill() == 0) {
+                        printlnCenter("Tidak ada.", lengthConsole);
+                    } else {
+                        for (Card card : listUser.fill[indexUserLogin].backpack.getCards()) {
+                            System.out.printf("| %-10s | %-18s | Rp%-10s |\n", card.rarity, card.pokemon, moneyFormat(card.harga));
+                            System.out.printf("| %-10s | %-18s | Rp%-10s |\n", card.rarity, card.pokemon, moneyFormat(card.harga));
+                            totalPrice += card.harga;
+                            listUser.fill[indexUserLogin].backpack.addCard(card);
+                        }
+                    }
+                    System.out.println("-".repeat(lengthConsole));
+                    System.out.printf("%" + (lengthConsole - 2) + "s |\n", "Total Harga: Rp" + moneyFormat(totalPrice));
+                    System.out.println("=".repeat(lengthConsole));
+                    System.out.println("""
+                            Menu Backpack:
+                            1. Jual
+                            2. Upgrade""");
+                    System.out.println("Pilihan: ");
+                    int pil = sc.nextInt();
                 }
                 case 3 -> {
-
-//                    System.out.println("Slot Bpack : " + Backpack.slot);
-                    System.out.printf("|%-16s |%-16s |%-16s |\n", "List Ternak", "Value", "Rarity");
-                    System.out.println("+-----------------------------------+");
-                    for (int i = 0; i < Backpack.index; i++) {
-                        System.out.printf("|%-17s|%-17d|%-17s|\n", Backpack.getCards()[i].pokemon, Backpack.getCards()[i].harga, Backpack.getCards()[i].rarity);
-                    }
-                    break;
-                }
-                case 4 -> {
-
                     System.out.println("""
                             -Pilihan Upgrade Bpack-
                             1. +5 Slot
                             2. +10 Slot
                             Pilihan :\s""");
                     int upgrade = sc.nextInt();
-//                    System.out.println("Slot Bpack : " + Backpack.slot);
                     switch (upgrade) {
                         case 1:
                             Backpack.upgrade(5);
@@ -154,18 +189,18 @@ public class Main {
                             Backpack.upgrade(10);
                             break;
                     }
-                    break;
-                }
-                case 5 -> {
-
                 }
             }
         } while (true);
     }
 
     static void printInfoUser(User user) {
-        System.out.println("Username: " + user.getNama());
-        System.out.println("Uang: Rp." + String.format("%,d\n",user.uang));
-        System.out.println("Backpack: " + user.backpack.getTotalFill() + "/" + user.backpack.getSlot() + " Pokemon");
+        System.out.printf("%-15s: %s\n", "Username", user.getName());
+        System.out.printf("%-15s: Rp%s\n", "Uang", moneyFormat(user.money));
+        System.out.printf("%-15s: %s\n", "Backpack", user.backpack.getTotalFill() + "/" + user.backpack.getSlot() + " Pokemon");
+    }
+
+    static String moneyFormat(int sum) {
+        return String.format("%,d", sum);
     }
 }

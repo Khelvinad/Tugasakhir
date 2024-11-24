@@ -1,21 +1,24 @@
 package model;
 
+import seed.Pokemon;
+import utils.Random;
+
 public class User {
-    private String nama;
+    private String name;
     public int userId;
-    public int uang = 150000;
+    public int money = 150000;
     private String password;
     public Backpack backpack;
 
     public User(String nama, String password, int userId) {
         backpack = new Backpack();
-        this.nama = nama;
+        this.name = nama;
         this.password = password;
         this.userId = userId;
     }
 
-    public String getNama() {
-        return nama;
+    public String getName() {
+        return name;
     }
 
     public String getPassword() {
@@ -26,8 +29,18 @@ public class User {
         return userId;
     }
 
-    public void gacha(int total){
+    public Card[] gacha(int total) {
         int[] gachaIndex = new int[total];
+        Card[] newCards = new Card[total];
 
+        for (int i = 0; i < total; i++) {
+            gachaIndex[i] = Random.init(Pokemon.getPokemonSeed().length - 1, 0);
+        }
+
+        for (int i = 0; i < total; i++) {
+            newCards[i] = Pokemon.getPokemonSeed()[gachaIndex[i]];
+        }
+
+        return newCards;
     }
 }

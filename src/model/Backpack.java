@@ -2,19 +2,19 @@ package model;
 
 public class Backpack {
     public static int index = 0;
-    public static int lastIndexCard = 0;
-    private static Kartu[] cards = new Kartu[5];
+    public static int lastIndexCard = -1;
+    private static Card[] cards = new Card[5];
 
-    public int getSlot(){
+    public int getSlot() {
         return cards.length;
     }
 
-    public int getTotalFill(){
-        return lastIndexCard;
+    public int getTotalFill() {
+        return lastIndexCard + 1;
     }
 
     public static void upgrade(int up) {
-        Kartu[] newCards = new Kartu[cards.length + up];
+        Card[] newCards = new Card[cards.length + up];
 
         for (int i = 0; i < cards.length; i++) {
             newCards[i] = cards[i];
@@ -23,31 +23,20 @@ public class Backpack {
         cards = newCards;
     }
 
-    public boolean addCard(Kartu card) {
+    public boolean addCard(Card card) {
         if (cards.length == (lastIndexCard + 1))
             return false;
-        cards[lastIndexCard] = card;
         lastIndexCard += 1;
+        cards[lastIndexCard] = card;
         return true;
     }
 
-    public static Kartu[] getCards() {
+    public Card[] getCards() {
         return cards;
     }
 
     public void sellCard(int index) {
         cards[index] = null;
-        Kartu[] newCards = new Kartu[cards.length];
-
-        loopNewCards:
-        for (int i = 0; cards.length > i; i++) {
-            loopOldCards:
-            for (Kartu card : cards) {
-               if (card == null){
-                   continue loopOldCards;
-               }
-
-            }
-        }
+        Card.sortCard(cards);
     }
 }

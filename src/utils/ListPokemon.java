@@ -1,9 +1,9 @@
 package utils;
 
-import model.Kartu;
+import model.Card;
 
 public class ListPokemon {
-    public static Kartu[] add(Kartu[] cards, Kartu card) {
+    public static Card[] add(Card[] cards, Card card) {
         return cards;
     }
 }
