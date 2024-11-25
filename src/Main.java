@@ -212,7 +212,8 @@ public class Main {
                                 }
                                 System.out.print("ID: ");
                                 int id = sc.nextInt();
-                                userLogin.money += userLogin.backpack.getCards()[id - 1].harga;
+                                if (userLogin != null)
+                                    userLogin.money += userLogin.backpack.getCards()[id - 1].harga;
                                 listUser.fill[indexUserLogin].backpack.sellCard(id - 1);
                             }
                             case 2 -> {

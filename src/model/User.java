@@ -1,7 +1,6 @@
 package model;
 
 import seed.Pokemon;
-import utils.Random;
 
 public class User {
     private String name;
@@ -34,7 +33,7 @@ public class User {
         Card[] newCards = new Card[total];
 
         for (int i = 0; i < total; i++) {
-            gachaIndex[i] = Random.init(Pokemon.getPokemonSeed().length - 1, 0);
+            gachaIndex[i] = random(Pokemon.getPokemonSeed().length - 1, 0);
         }
 
         for (int i = 0; i < total; i++) {
@@ -42,5 +41,9 @@ public class User {
         }
 
         return newCards;
+    }
+
+    public static int random(int max, int min) {
+        return (int) (Math.random() * max) + min;
     }
 }
