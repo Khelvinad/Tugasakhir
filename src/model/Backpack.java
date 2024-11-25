@@ -1,7 +1,6 @@
 package model;
 
 public class Backpack {
-    public static int index = 0;
     public static int lastIndexCard = -1;
     private static Card[] cards = new Card[5];
 

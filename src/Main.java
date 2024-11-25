@@ -17,8 +17,10 @@ public class Main {
     protected static User userLogin;
 
     public static void main(String[] args) throws InterruptedException {
-        auth();
-        if (login) gamesLogic();
+        while (true) {
+            auth();
+            if (login) gamesLogic();
+        }
     }
 
     static void printMenuGame() {
@@ -110,6 +112,7 @@ public class Main {
             switch (choice) {
                 case 0 -> {
                     System.out.println("Keluar.");
+                    logout();
                     break loopLogic;
                 }
                 case 1 -> {
@@ -152,6 +155,7 @@ public class Main {
                     loopBackpack:
                     while (true) {
                         printlnCenter("Daftar Pokemon", lengthConsole);
+                        printlnCenter(userLogin.backpack.getTotalFill() + "/" + userLogin.backpack.getSlot() + " Pokemon", lengthConsole);
                         System.out.println("=".repeat(lengthConsole));
                         System.out.printf("| %2s | %-10s | %-14s | Rp%-9s |\n", "ID", "Rarity", "Pokemon", "Harga");
                         System.out.println("-".repeat(lengthConsole));
@@ -187,20 +191,23 @@ public class Main {
                                 }
                                 System.out.print("ID: ");
                                 int id = sc.nextInt();
+                                userLogin.money += userLogin.backpack.getCards()[id - 1].harga;
                                 listUser.fill[indexUserLogin].backpack.sellCard(id - 1);
                             }
                             case 2 -> {
                                 System.out.println("""
                                         Upgrade Backpack:
-                                        1. +5 Slot
-                                        2. +10 Slot""");
+                                        1. +5 Slot - Rp50.000
+                                        2. +10 Slot - Rp100.000""");
                                 System.out.print("Pilihan: ");
                                 int upgrade = sc.nextInt();
                                 switch (upgrade) {
                                     case 1:
+                                        userLogin.money -= 50000;
                                         userLogin.backpack.upgrade(5);
                                         break;
                                     case 2:
+                                        userLogin.money -= 100000;
                                         userLogin.backpack.upgrade(10);
                                         break;
                                 }

@@ -6,7 +6,7 @@ import utils.Random;
 public class User {
     private String name;
     public int userId;
-    public int money = 150000;
+    public int money = 30000;
     private String password;
     public Backpack backpack;
 
