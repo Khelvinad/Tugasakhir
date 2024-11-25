@@ -195,6 +195,7 @@ public class Main {
                                 listUser.fill[indexUserLogin].backpack.sellCard(id - 1);
                             }
                             case 2 -> {
+                                System.out.println("=".repeat(lengthConsole));
                                 System.out.println("""
                                         Upgrade Backpack:
                                         1. +5 Slot - Rp50.000
@@ -203,10 +204,18 @@ public class Main {
                                 int upgrade = sc.nextInt();
                                 switch (upgrade) {
                                     case 1:
+                                        if (userLogin.money <= 50000) {
+                                            System.out.println("Uang anda kurang");
+                                            break;
+                                        }
                                         userLogin.money -= 50000;
                                         userLogin.backpack.upgrade(5);
                                         break;
                                     case 2:
+                                        if (userLogin.money <= 100000) {
+                                            System.out.println("Uang anda kurang");
+                                            break;
+                                        }
                                         userLogin.money -= 100000;
                                         userLogin.backpack.upgrade(10);
                                         break;
