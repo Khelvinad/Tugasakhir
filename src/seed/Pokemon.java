@@ -3,14 +3,13 @@ package seed;
 import model.Card;
 
 public class Pokemon {
-
     public static Card[] getPokemonSeed() {
         return new Card[]{
-                new Card("Rare", "Pikachu", 8000),
+                new Card("Rare", "Pikachu", 20000),
                 new Card("Rare", "Charizard", 10000),
-                new Card("Rare", "Mewtwo", 9500),
-                new Card("Rare", "Rayquaza", 9000),
-                new Card("Rare", "Lugia", 8500),
+                new Card("Rare", "Mewtwo", 25000),
+                new Card("Rare", "Rayquaza", 13000),
+                new Card("Rare", "Lugia", 18500),
                 new Card("Uncommon", "Slowpoke", 7000),
                 new Card("Uncommon", "Muk", 7500),
                 new Card("Uncommon", "Ditto", 6800),

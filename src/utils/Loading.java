@@ -16,7 +16,7 @@ public class Loading {
             System.out.print("] " + i * 5 + "%");
             if (i < 20) {
                 System.out.print("\r");
-                Thread.sleep(300);
+                Thread.sleep(100);
             }
             i++;
         }

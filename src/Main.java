@@ -51,6 +51,7 @@ public class Main {
 
     static void printAuthMenu() {
         System.out.println("=".repeat(lengthConsole));
+        printlnCenter("POCEMON", lengthConsole);
         printlnCenter("Selamat Datang", lengthConsole);
         printlnCenter("Silahkan masuk menggunakan akun terlebih dahulu", lengthConsole);
         System.out.println("=".repeat(lengthConsole));
@@ -138,11 +139,11 @@ public class Main {
                     while (true) {
                         System.out.println("* Masukkan 0 untuk keluar");
                         System.out.println("1x Gacha Rp" + moneyFormat(hargaGacha));
-                        int maxGacha = userLogin.backpack.getEmptySlot();
+                        int maxGacha = Math.min((userLogin.money / hargaGacha), userLogin.backpack.getEmptySlot());
                         System.out.println("Max gacha: " + maxGacha + "x");
                         System.out.print("Gacha: ");
                         int totalGacha = sc.nextInt();
-                        if (totalGacha > listUser.fill[indexUserLogin].backpack.getSlot()) {
+                        if (totalGacha > userLogin.backpack.getSlot()) {
                             System.out.println("Uang atau slot tidak cukup.");
                             System.out.println("-".repeat(lengthConsole));
                             continue;
