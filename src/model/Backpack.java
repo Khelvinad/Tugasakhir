@@ -13,7 +13,7 @@ public class Backpack {
         return lastIndexCard + 1;
     }
 
-    public static void upgrade(int up) {
+    public void upgrade(int up) {
         Card[] newCards = new Card[cards.length + up];
 
         for (int i = 0; i < cards.length; i++) {
@@ -38,5 +38,14 @@ public class Backpack {
     public void sellCard(int index) {
         cards[index] = null;
         Card.sortCard(cards);
+        lastIndexCard -= 1;
+    }
+
+    public int getLastIndexCard() {
+        return lastIndexCard;
+    }
+
+    public int getEmptySlot() {
+        return cards.length - (lastIndexCard + 1);
     }
 }

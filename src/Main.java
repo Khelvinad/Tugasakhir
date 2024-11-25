@@ -3,6 +3,7 @@ import model.Card;
 import model.User;
 import utils.ListUser;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -11,9 +12,9 @@ public class Main {
     static boolean login = false;
     protected static int lengthConsole = 50;
     protected static int userIdCounter = 1;
-    protected static int userIdLogin = 0;
     protected static int indexUserLogin = -1;
     protected static int hargaGacha = 5000;
+    protected static User userLogin;
 
     public static void main(String[] args) throws InterruptedException {
         auth();
@@ -63,18 +64,16 @@ public class Main {
                     nama = sc.next();
                     System.out.print("Masukkan Password : ");
                     password = sc.next();
-
                     User[] users = listUser.fill;
                     for (int i = 0; i < users.length; i++) {
                         if (users[i].getName().equals(nama) && users[i].getPassword().equals(password)) {
                             System.out.println("Login berhasil!");
                             login = true;
-                            userIdLogin = users[i].getUserId();
                             indexUserLogin = i;
+                            userLogin = users[i];
                             break loopAuth;
                         }
                     }
-
                     System.out.println("Login gagal! Username belum terdaftar.");
                 }
                 case 2 -> {
@@ -96,7 +95,6 @@ public class Main {
     }
 
     static void logout() {
-        userIdLogin = 0;
         login = false;
         indexUserLogin = -1;
     }
@@ -117,21 +115,23 @@ public class Main {
                 case 1 -> {
                     while (true) {
                         System.out.println("* Masukkan 0 untuk keluar");
-                        System.out.println("1x Gacha Rp10.000");
-                        int maxGacha = listUser.fill[indexUserLogin].money / hargaGacha;
+                        System.out.println("1x Gacha Rp" + moneyFormat(hargaGacha));
+                        int maxGacha = userLogin.backpack.getEmptySlot();
                         System.out.println("Max gacha: " + maxGacha + "x");
                         System.out.print("Gacha: ");
                         int totalGacha = sc.nextInt();
                         if (totalGacha > listUser.fill[indexUserLogin].backpack.getSlot()) {
-                            System.out.println("Slot tidak cukup.");
+                            System.out.println("Uang atau slot tidak cukup.");
+                            System.out.println("-".repeat(lengthConsole));
                             continue;
                         } else if (totalGacha > maxGacha) {
-                            System.out.println("Uang anda kurang.");
+                            System.out.println("Uang atau slot anda kurang.");
                             System.out.println("-".repeat(lengthConsole));
                             continue;
                         } else if (totalGacha == 0) {
                             break;
                         }
+                        listUser.fill[indexUserLogin].money -= totalGacha * hargaGacha;
                         Card[] gacha = listUser.fill[indexUserLogin].gacha(totalGacha);
                         System.out.println("=".repeat(lengthConsole));
                         System.out.printf("| %-10s | %-18s | Rp%-10s |\n", "Rarity", "Pokemon", "Harga");
@@ -149,46 +149,70 @@ public class Main {
                     System.out.println("=".repeat(lengthConsole));
                 }
                 case 2 -> {
-                    printlnCenter("Daftar Pokemon", lengthConsole);
-                    System.out.println("=".repeat(lengthConsole));
-                    System.out.printf("| %-10s | %-18s | Rp%-10s |\n", "Rarity", "Pokemon", "Harga");
-                    System.out.println("-".repeat(lengthConsole));
-                    int totalPrice = 0;
-                    if (listUser.fill[indexUserLogin].backpack.getTotalFill() == 0) {
-                        printlnCenter("Tidak ada.", lengthConsole);
-                    } else {
-                        for (Card card : listUser.fill[indexUserLogin].backpack.getCards()) {
-                            System.out.printf("| %-10s | %-18s | Rp%-10s |\n", card.rarity, card.pokemon, moneyFormat(card.harga));
-                            System.out.printf("| %-10s | %-18s | Rp%-10s |\n", card.rarity, card.pokemon, moneyFormat(card.harga));
-                            totalPrice += card.harga;
-                            listUser.fill[indexUserLogin].backpack.addCard(card);
+                    loopBackpack:
+                    while (true) {
+                        printlnCenter("Daftar Pokemon", lengthConsole);
+                        System.out.println("=".repeat(lengthConsole));
+                        System.out.printf("| %2s | %-10s | %-14s | Rp%-9s |\n", "ID", "Rarity", "Pokemon", "Harga");
+                        System.out.println("-".repeat(lengthConsole));
+                        int totalPrice = 0;
+                        if (listUser.fill[indexUserLogin].backpack.getTotalFill() == 0) {
+                            printlnCenter("Tidak ada.", lengthConsole);
+                        } else {
+                            Card[] cards = listUser.fill[indexUserLogin].backpack.getCards();
+                            for (int i = 0; i < cards.length; i++) {
+                                if (cards[i] != null) {
+                                    System.out.printf("| %2d | %-10s | %-14s | Rp%-9s |\n", i + 1, cards[i].rarity, cards[i].pokemon, moneyFormat(cards[i].harga));
+                                    totalPrice += cards[i].harga;
+                                } else {
+                                    System.out.printf("| %2d | %-10s | %-14s | %-11s |\n", i + 1, "-", "-", "-");
+                                }
+                            }
                         }
+                        System.out.println("-".repeat(lengthConsole));
+                        System.out.printf("%" + (lengthConsole - 2) + "s |\n", "Total Harga: Rp" + moneyFormat(totalPrice));
+                        System.out.println("=".repeat(lengthConsole));
+                        System.out.println("""
+                                Menu Backpack:
+                                1. Jual Kartu
+                                2. Upgrade Bacpack
+                                0. Kembali""");
+                        System.out.print("Pilihan: ");
+                        int pil = sc.nextInt();
+                        switch (pil) {
+                            case 1 -> {
+                                if (listUser.fill[indexUserLogin].backpack.getLastIndexCard() == -1) {
+                                    System.out.println("Tidak ada kartu yang tersedia. Lakukan gacha!");
+                                    break;
+                                }
+                                System.out.print("ID: ");
+                                int id = sc.nextInt();
+                                listUser.fill[indexUserLogin].backpack.sellCard(id - 1);
+                            }
+                            case 2 -> {
+                                System.out.println("""
+                                        Upgrade Backpack:
+                                        1. +5 Slot
+                                        2. +10 Slot""");
+                                System.out.print("Pilihan: ");
+                                int upgrade = sc.nextInt();
+                                switch (upgrade) {
+                                    case 1:
+                                        userLogin.backpack.upgrade(5);
+                                        break;
+                                    case 2:
+                                        userLogin.backpack.upgrade(10);
+                                        break;
+                                }
+                                System.out.println("Backpack ter-upgrade.");
+                            }
+                            case 0 -> {
+                                break loopBackpack;
+                            }
+                        }
+                        System.out.println("=".repeat(lengthConsole));
                     }
-                    System.out.println("-".repeat(lengthConsole));
-                    System.out.printf("%" + (lengthConsole - 2) + "s |\n", "Total Harga: Rp" + moneyFormat(totalPrice));
                     System.out.println("=".repeat(lengthConsole));
-                    System.out.println("""
-                            Menu Backpack:
-                            1. Jual
-                            2. Upgrade""");
-                    System.out.println("Pilihan: ");
-                    int pil = sc.nextInt();
-                }
-                case 3 -> {
-                    System.out.println("""
-                            -Pilihan Upgrade Bpack-
-                            1. +5 Slot
-                            2. +10 Slot
-                            Pilihan :\s""");
-                    int upgrade = sc.nextInt();
-                    switch (upgrade) {
-                        case 1:
-                            Backpack.upgrade(5);
-                            break;
-                        case 2:
-                            Backpack.upgrade(10);
-                            break;
-                    }
                 }
             }
         } while (true);
